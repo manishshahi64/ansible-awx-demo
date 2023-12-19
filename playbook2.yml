@@ -1,0 +1,8 @@
+---
+- name: install the defaults application
+  hosts: all
+  remote_user: sensen
+  become: yes
+  become_user: root
+  roles:
+    - install_default

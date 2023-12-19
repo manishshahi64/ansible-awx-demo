@@ -1,0 +1,59 @@
+---
+- name: PostgreSQL | Make sure the CA certificates are available | apt
+  ansible.builtin.apt:
+    pkg: ca-certificates
+    state: present
+
+- name: PostgreSQL | Add PostgreSQL repository apt-key | apt
+  ansible.builtin.apt_key:
+    id: "{{ postgresql_apt_key_id }}"
+    url: "{{ postgresql_apt_key_url }}"
+    state: present
+    keyring: /etc/apt/trusted.gpg.d/postgresql.gpg
+  when: postgresql_apt_key_url and postgresql_apt_key_id
+
+- name: PostgreSQL | Add PostgreSQL repository | apt
+  ansible.builtin.apt_repository:
+    repo: "{{ postgresql_apt_repository }}"
+    state: present
+  when: (ansible_facts['distribution_release'] != "bionic")
+
+- name: PostgreSQL | Add PostgreSQL repository bionic | apt
+  ansible.builtin.apt_repository:
+    repo: "{{ postgresql_apt_repository_ubuntu_18 }}"
+    state: present
+  when: (ansible_facts['distribution_release'] == "bionic") # only execute if ubuntu release version is bionic 
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: PostgreSQL | Install postgresql and postgis-scripts
+  ansible.builtin.apt:
+    pkg:
+    - "postgresql-{{postgresql_version}}"
+    - "postgresql-{{postgresql_version}}-postgis-{{postgis_version}}"
+    - libpq-dev
+    - acl
+    - python3-psycopg2
+    state: present
+
+- name: PostgreSQL | Create a new database with name sndb
+  become: true
+  become_user: postgres
+  environment:
+    PATH: "/usr/local/bin:/usr/bin:/bin"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+  postgresql_db: name={{ postgresql_database }}
+    template='template0'
+    state=present
+
+- name: PostgreSQL | Ensure user has access to the new database
+  become: true
+  become_user: postgres
+  postgresql_user: db={{ postgresql_database }}
+    name={{ postgresql_user }}
+    password={{ postgresql_password }}
+    priv=ALL
+    state=present

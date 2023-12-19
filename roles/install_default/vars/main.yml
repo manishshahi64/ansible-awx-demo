@@ -1,0 +1,31 @@
+---
+packages_to_install:
+  - tzdata
+  - lftp
+  - mediainfo
+  - vim
+  - nano
+  - software-properties-common
+  - binutils
+  - supervisor
+  - sshpass
+  - git
+  - curl
+  - htop
+  - iotop
+  - vnstat
+  - openjdk-8-jdk
+  - python3-pip
+
+# APT settings
+postgresql_apt_key_id: "ACCC4CF8"
+postgresql_apt_key_url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+postgresql_apt_repository: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main {{ postgresql_version }}"
+postgresql_apt_repository_ubuntu_18: "deb https://apt-archive.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main {{ postgresql_version }}"
+
+# Database configs
+postgresql_version: 14
+postgis_version: 3
+postgresql_user: myuser
+postgresql_password: mypass
+postgresql_database: mydb

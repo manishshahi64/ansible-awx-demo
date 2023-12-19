@@ -1,0 +1,16 @@
+---
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_os_family == 'Debian')  # For Debian-based systems
+
+- name: Prerequisite | Install packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ packages_to_install }}"
+  notify:
+   - update-supervisor
+   
+- name: Handlers | Force all notified handlers
+  ansible.builtin.meta: flush_handlers

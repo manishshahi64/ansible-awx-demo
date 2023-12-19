@@ -1,0 +1,6 @@
+---
+- name: Prerequisite | install prerequisite applications
+  include_tasks: install_prerequisite.yml
+  
+- name: PostgreSQL | install postgres
+  include_tasks: install_postgres.yml
